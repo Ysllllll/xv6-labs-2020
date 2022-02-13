@@ -22,3 +22,8 @@ xv6.out*
 submissions/
 ph
 barrier
+01translate/
+02xv6-chinese/
+03lecture-note/
+gdb-11.2/
+nano.save
