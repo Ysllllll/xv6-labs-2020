@@ -81,7 +81,7 @@ void usertrap(void)
   // give up the CPU if this is a timer interrupt.
   if (which_dev == 2)
   {
-    if ((p->alarm_enable == 1) && (p->alarm_interval != 0))
+    if (p->alarm_enable && (p->alarm_interval != 0))
     {
       // 存在计时任务 才 记录一次心跳
       p->alarm_passedticks++;
@@ -89,8 +89,6 @@ void usertrap(void)
       if (p->alarm_passedticks >= p->alarm_interval)
       {
         // 用户空间点1->内核空间->用户空间点2->内核空间->用户空间点1
-        // 第一次跳入内核空间是由于 sigalarm
-        // 第二次跳入内核空间是由于 sigreturn
         *p->alarm_trapframe = *p->trapframe;
 
         // 将定时函数地址赋值给 sepc，sret时自动加载sepc，跳转至sepc(定时函数)处执行
@@ -99,7 +97,8 @@ void usertrap(void)
       }
       printf("alarm\n");
     }
-    // yield();
+    // 底下这句不能注释掉，否则会出现问题
+    yield();
   }
 
   usertrapret();

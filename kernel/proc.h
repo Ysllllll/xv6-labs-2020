@@ -117,6 +117,6 @@ struct proc
   uint64 alarm_interval;
   uint64 alarm_fn;
   uint64 alarm_passedticks;
-  struct trapframe *alarm_trapframe; // 用于保存原始用户栈帧
+  struct trapframe *alarm_trapframe; // 用于保存原始用户栈帧，这里可以优化，使用trapframe的下半部分！
   uint64 alarm_enable;
 };
