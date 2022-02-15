@@ -100,23 +100,20 @@ walkaddr(pagetable_t pagetable, uint64 va)
 {
   pte_t *pte;
   uint64 pa;
-  struct proc *p = myproc(); // lab5-3
+  struct proc *p = myproc();
 
   if (va >= MAXVA)
     return 0;
 
   pte = walk(pagetable, va, 0);
-  // lazy allocation - lab5-3
   if (pte == 0 || (*pte & PTE_V) == 0)
   {
-    // va is on the user heap
-    if (va >= PGROUNDUP(p->trapframe->sp) && va < p->sz)
+    if (PGROUNDUP(p->trapframe->sp) <= va && va < p->sz)
     {
       char *pa;
       if ((pa = kalloc()) == 0)
-      {
         return 0;
-      }
+
       memset(pa, 0, PGSIZE);
       if (mappages(p->pagetable, PGROUNDDOWN(va), PGSIZE,
                    (uint64)pa, PTE_W | PTE_R | PTE_U) != 0)
@@ -126,9 +123,7 @@ walkaddr(pagetable_t pagetable, uint64 va)
       }
     }
     else
-    {
       return 0;
-    }
   }
   if ((*pte & PTE_U) == 0)
     return 0;

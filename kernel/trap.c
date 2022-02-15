@@ -172,36 +172,6 @@ void kerneltrap()
   if (intr_get() != 0)
     panic("kerneltrap: interrupts enabled");
 
-  struct proc *p = myproc();
-  if (scause == 13 || scause == 15)
-  {
-    uint64 pagefault_addr = r_stval();
-    if (PGROUNDDOWN(p->trapframe->sp) == PGROUNDUP(pagefault_addr))
-    {
-      p->killed = 1;
-    }
-    else if (p->sz <= PGROUNDDOWN(pagefault_addr))
-    {
-      p->killed = 1;
-    }
-    else
-    {
-      printf("kernel page fault %p\n", pagefault_addr);
-      char *mem = kalloc();
-      if (mem == 0)
-        p->killed = 1;
-      else
-      {
-        memset(mem, 0, PGSIZE);
-        if (mappages(p->pagetable, PGROUNDDOWN(pagefault_addr), PGSIZE, (uint64)mem, PTE_W | PTE_R | PTE_U) != 0)
-        {
-          kfree(mem);
-          p->killed = 1;
-        }
-      }
-    }
-  }
-
   if ((which_dev = devintr()) == 0)
   {
     printf("scause %p\n", scause);
