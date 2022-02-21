@@ -1,0 +1,17 @@
+举例如：
+    thread 1 执行: insert( 0, 0, &table[0], table[0])
+    thread 2 执行: insert(10, 1, &table[0], table[0])
+
+    thread 1:   struct entry *e1 = malloc(sizeof(struct entry));
+                e1->key = key;
+                e1->value = value;
+                e1->next = n;
+    thread 2:   struct entry *e2 = malloc(sizeof(struct entry));
+                e2->key = key;
+                e2->value = value;
+                e2->next = n;
+    thread 1:   *p = e1;
+    thread 2:   *p = e2;
+
+    result:     e1 miss
+    solution:   Lock only the insert operation
